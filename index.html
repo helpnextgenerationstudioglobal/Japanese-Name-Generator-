@@ -277,6 +277,80 @@
 
     </div>
 </div>
+  <!-- Floating Mobile Navigation Bar -->
+<style>
+  .floating-bar {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    background: rgba(17, 24, 39, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .floating-bar a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  .floating-bar a:hover,
+  .floating-bar a.active {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Hide on desktop */
+  @media (min-width: 768px) {
+    .floating-bar {
+      display: none;
+    }
+  }
+</style>
+
+<div class="floating-bar" id="floatingBar">
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+  <a href="privacy.html">Privacy</a>
+  <a href="terms.html">Terms</a>
+  <a href="contactus.html">Contact</a>
+</div>
+
+<script>
+  // Highlight active page
+  const links = document.querySelectorAll('.floating-bar a');
+  const currentPage = location.pathname.split('/').pop() || 'index.html';
+
+  links.forEach(link => {
+    if (link.getAttribute('href') === currentPage) {
+      link.classList.add('active');
+    }
+  });
+
+  // Auto-hide on scroll (iOS-style)
+  let lastScrollY = window.scrollY;
+  const bar = document.getElementById('floatingBar');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > lastScrollY) {
+      bar.style.opacity = '0';
+      bar.style.transform = 'translateX(-50%) translateY(20px)';
+    } else {
+      bar.style.opacity = '1';
+      bar.style.transform = 'translateX(-50%) translateY(0)';
+    }
+    lastScrollY = window.scrollY;
+  });
+                          </script>
 <!-- Google AdSense -->
   <script async
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9100785821752628"
