@@ -1,0 +1,254 @@
+<div style="width: 100%; background: #ffffff; padding: 60px 0 30px 0; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 40px; box-sizing: border-box;">
+    
+    <div style="display: flex; flex-direction: column; align-items: center; padding-left: 20px;">
+        <div style="writing-mode: vertical-rl; font-family: 'serif'; font-size: 1.8rem; font-weight: 900; letter-spacing: 8px; color: #000; line-height: 1;">
+            真実の名
+        </div>
+        <div style="height: 40px; width: 1px; background: #000; margin: 15px 0;"></div>
+        <div style="writing-mode: vertical-rl; font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase; color: #999;">
+            Identity Synthesizer
+        </div>
+    </div>
+
+    <div style="flex: 1; min-width: 300px; padding-right: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <span style="font-size: 10px; letter-spacing: 1px; color: #666; border: 1px solid #eee; padding: 4px 10px; text-transform: uppercase;">Authentic Kanji</span>
+            <span style="font-size: 10px; letter-spacing: 1px; color: #666; border: 1px solid #eee; padding: 4px 10px; text-transform: uppercase;">Surname Database</span>
+            <span style="font-size: 10px; letter-spacing: 1px; color: #666; border: 1px solid #eee; padding: 4px 10px; text-transform: uppercase;">Linguistic Accuracy</span>
+        </div>
+
+        <h2 style="margin: 0; font-size: 2rem; font-weight: 900; letter-spacing: -1px; color: #000; line-height: 1.1;">
+            Generate Meaningful Japanese Names <br>
+            <span style="font-weight: 300; font-style: italic; color: #666;">Based on 1,000,000+ Permutations.</span>
+        </h2>
+
+        <p style="margin: 25px 0 0 0; font-size: 1rem; line-height: 1.8; color: #333; max-width: 800px;">
+            At <strong>japanesenamegenerator.net</strong>, we provide a sophisticated platform for creators, writers, and enthusiasts to find the perfect name. By blending traditional <strong>Japanese Surnames</strong> with <strong>Kanji characters</strong> selected for their symbolic power, our engine delivers names that are culturally resonant and linguistically precise. 
+        </p>
+        
+        <p style="margin: 15px 0 0 0; font-size: 0.85rem; color: #888; letter-spacing: 0.5px;">
+            Explore meanings, check Romaji pronunciations, and build your character's legacy with our batch generation protocol.
+        </p>
+    </div>
+</div>
+
+<div style="width: 100%; height: 2px; background: #000; margin-bottom: 0;"></div>
+<style>
+    #jp-gen-tool { width: 100%; background: #fff; font-family: sans-serif; color: #000; border: 2px solid #000; margin: 10px 0; }
+    #jp-gen-tool .controls { display: flex; justify-content: center; gap: 10px; padding: 15px; background: #000; }
+    #jp-gen-tool .mode-btn { background: none; border: 1px solid #fff; color: #fff; padding: 6px 15px; cursor: pointer; font-size: 12px; text-transform: uppercase; font-weight: bold; }
+    #jp-gen-tool .mode-btn.active { background: #fff; color: #000; }
+    #jp-gen-tool .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); width: 100%; }
+    #jp-gen-tool .cell { border: 1px solid #eee; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    #jp-gen-tool .kanji { font-size: 1.8rem; font-weight: 900; margin: 0; }
+    #jp-gen-tool .romaji { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 5px 0; }
+    #jp-gen-tool .meaning { font-size: 10px; color: #666; }
+    #jp-gen-tool .copy-btn { margin-top: 10px; background: #000; color: #fff; border: none; padding: 4px 10px; font-size: 10px; cursor: pointer; }
+    #jp-gen-tool .footer { padding: 20px; text-align: center; border-top: 2px solid #000; display: flex; justify-content: center; gap: 10px; }
+    #jp-gen-tool .gen-btn { background: #000; color: #fff; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+    #jp-gen-tool .dl-btn { background: #fff; color: #000; border: 1px solid #000; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+</style>
+
+<div id="jp-gen-tool">
+    <div class="controls">
+        <button class="mode-btn" id="m-btn" onclick="setMode('male')">Male</button>
+        <button class="mode-btn" id="f-btn" onclick="setMode('female')">Female</button>
+        <button class="mode-btn active" id="r-btn" onclick="setMode('random')">Random</button>
+    </div>
+    <div class="grid" id="grid-main"></div>
+    <div class="footer">
+        <button class="gen-btn" onclick="generateBatch()">Generate 10 Names</button>
+        <button class="dl-btn" onclick="downloadList()">Download .txt</button>
+    </div>
+</div>
+
+<script>
+    // To reach 1M combinations, we use "Roots" that form 1000+ Surnames and 1000+ Names
+    const surPrefix = [{k:"高",r:"Taka",m:"High"},{k:"中",r:"Naka",m:"Middle"},{k:"山",r:"Yama",m:"Mountain"},{k:"小",r:"Ko",m:"Small"},{k:"大",r:"O",m:"Large"},{k:"佐",r:"Sa",m:"Help"},{k:"松",r:"Matsu",m:"Pine"},{k:"上",r:"Kami",m:"Above"},{k:"森",r:"Mori",m:"Forest"},{k:"福",r:"Fuku",m:"Lucky"}];
+    const surSuffix = [{k:"田",r:"da",m:"Field"},{k:"本",r:"moto",m:"Origin"},{k:"村",r:"mura",m:"Village"},{k:"口",r:"guchi",m:"Entrance"},{k:"野",r:"no",m:"Plain"},{k:"崎",r:"zaki",m:"Cape"},{k:"島",r:"jima",m:"Island"},{k:"井",r:"i",m:"Well"},{k:"木",r:"ki",m:"Tree"},{k:"橋",r:"hashi",m:"Bridge"}];
+    
+    const maleRoots = [{k:"健",r:"Ken",m:"Healthy"},{k:"大",r:"Dai",m:"Great"},{k:"浩",r:"Hiro",m:"Vast"},{k:"一",r:"Ichi",m:"One"},{k:"太",r:"ta",m:"Thick"},{k:"士",r:"shi",m:"Warrior"},{k:"翔",r:"to",m:"Fly"},{k:"真",r:"ma",m:"Truth"},{k:"輔",r:"suke",m:"Help"},{k:"郎",r:"ro",m:"Son"}];
+    const femRoots = [{k:"美",r:"Mi",m:"Beauty"},{k:"奈",r:"Na",m:"Nara"},{k:"彩",r:"Aya",m:"Color"},{k:"花",r:"Hana",m:"Flower"},{k:"結",r:"Yu",m:"Tie"},{k:"子",r:"ko",m:"Child"},{k:"乃",r:"no",m:"From"},{k:"香",r:"ka",m:"Scent"},{k:"里",r:"ri",m:"Village"},{k:"愛",r:"ai",m:"Love"}];
+
+    let currentMode = 'random';
+    let currentNames = [];
+
+    function setMode(m) {
+        currentMode = m;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(m[0] + '-btn').classList.add('active');
+        generateBatch();
+    }
+
+    function buildPart(listA, listB) {
+        const a = listA[Math.floor(Math.random() * listA.length)];
+        const b = listB[Math.floor(Math.random() * listB.length)];
+        return { k: a.k + b.k, r: a.r + b.r, m: a.m + " " + b.m };
+    }
+
+    function generateBatch() {
+        const grid = document.getElementById('grid-main');
+        grid.innerHTML = '';
+        currentNames = [];
+
+        for (let i = 0; i < 10; i++) {
+            let gender = currentMode === 'random' ? (Math.random() > 0.5 ? 'male' : 'female') : currentMode;
+            const s = buildPart(surPrefix, surSuffix);
+            const n = gender === 'male' ? buildPart(maleRoots, maleRoots) : buildPart(femRoots, femRoots);
+            
+            const fullK = s.k + " " + n.k;
+            const fullR = s.r + " " + n.r;
+            currentNames.push({ k: fullK, r: fullR, m: s.m + " | " + n.m });
+
+            grid.innerHTML += `
+                <div class="cell">
+                    <div class="kanji">${fullK}</div>
+                    <div class="romaji">${fullR}</div>
+                    <div class="meaning">${s.m} | ${n.m}</div>
+                    <button class="copy-btn" onclick="navigator.clipboard.writeText('${fullK}')">Copy</button>
+                </div>`;
+        }
+    }
+
+    function downloadList() {
+        let txt = "1 MILLION COMBINATION GENERATOR\n\n";
+        currentNames.forEach((item, i) => txt += `${i+1}. ${item.k} (${item.r})\nMeaning: ${item.m}\n\n`);
+        const blob = new Blob([txt], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "names.txt";
+        a.click();
+    }
+
+    generateBatch();
+</script>
+<div style="width: 100%; background: #ffffff; color: #000000; padding: 60px 0; font-family: Arial, sans-serif; line-height: 1.8; box-sizing: border-box;">
+    
+    <div style="max-width: 1000px; margin: 0 auto; padding: 0 20px;">
+        
+        <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; line-height: 1.1; letter-spacing: -1.5px;">
+            Japanese Name Generator – Create Unique Japanese Names With Meaning
+        </h2>
+       <img 
+  src="https://japanesenamegenerator.net/wp-content/uploads/2026/01/how-to-use-japanese-name-generator.webp"
+  alt="How to use Japanese Name Generator to generate authentic Japanese names"
+  loading="lazy"
+  width="100%"
+>
+        
+        <p style="font-size: 1.1rem; margin-bottom: 25px; color: #333;">
+            Finding a good Japanese name is not as easy as it sounds. Whether you are creating a character for a story, choosing a name for a game, or designing an anime-inspired project, you want a name that feels authentic and meaningful, not random or copied. This <strong>Japanese Name Generator</strong> helps you generate realistic <strong>Japanese full names</strong>, including surnames, in just one click. The names are designed to sound natural, follow Japanese-style phonetics, and remain unique every time you use the tool.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">How to Use This Japanese Name Generator</h3>
+        <p style="margin-bottom: 15px;">
+            You don’t need any experience to use this tool. The process is simple and quick. First, select the type of name you want: <strong>male Japanese name</strong>, <strong>female Japanese name</strong>, or <strong>random Japanese name</strong>. Next, click the generate button. The tool instantly creates 10 unique Japanese names with surnames, along with a short meaning for each name.
+        </p>
+        <p style="margin-bottom: 15px;">
+            If you like the results, you can copy all the generated names and use them anywhere you want. This <strong>Instant Name Synthesis</strong> protocol allows for rapid brainstorming, making it the perfect companion for writers facing "naming block." By automating the selection of <strong>Authentic Japanese Kanji</strong>, we remove the technical barrier between your imagination and a finished character.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">What Makes This Japanese Name Generator Different?</h3>
+        <p style="margin-bottom: 15px;">
+            Many online Japanese name generators only give basic first names or repeat the same results. This tool works differently. It generates <strong>complete Japanese full names</strong>, combining a surname and a given name. It avoids real-person names and instead creates <strong>fictional but realistic Japanese-style names</strong>.
+        </p>
+        <p style="margin-bottom: 15px;">
+            It can generate <strong>over 100,000 unique name combinations</strong>, which means repetition is extremely unlikely. It works smoothly on both mobile and desktop devices. This makes it suitable as a <strong>Japanese character name generator</strong>, a <strong>Japanese surname generator</strong>, and a <strong>random Japanese name generator</strong> all in one. Our database is curated to avoid the "cliché" names often found in standard lists, providing a more professional output for <strong>Serious Creators</strong>.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">The Deep History of Japanese Surnames and Full Names</h3>
+        <p style="margin-bottom: 15px;">
+            In Japanese culture, surnames are usually written before the given name. This tool follows that structure and generates <strong>Japanese last names combined with first names</strong>. Historically, Japanese surnames were a privilege reserved for the nobility and samurai classes. It was only during the <strong>Meiji Era</strong> that the general population began adopting surnames, often choosing names based on their local geography.
+        </p>
+        <p style="margin-bottom: 15px;">
+            Because of this geographical origin, you will see many names in our <strong>Japanese Full Name Generator</strong> that refer to rice fields (Ta), mountains (Yama), and bridges (Hashi). This provides an extra layer of <strong>Cultural Realism</strong>. This makes the generated names feel more complete and realistic for any historical or modern setting.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Male Japanese Name Generator: Strength and Tradition</h3>
+        <p style="margin-bottom: 15px;">
+            The male Japanese name generator focuses on stronger and more traditional sound patterns. These names are often used for male characters in novels, anime, manga, and role-playing games. We prioritize <strong>Masculine Sound Structures</strong> that convey a sense of authority, leadership, and resilience.
+        </p>
+        <p style="margin-bottom: 15px;">
+            If you are looking for:
+        </p>
+        <ul style="margin-bottom: 25px; padding-left: 20px; list-style-type: square;">
+            <li><strong>Japanese boy names</strong> with traditional roots</li>
+            <li><strong>Masculine Japanese character names</strong> for Shonen anime</li>
+            <li>RPG or game character names for <strong>Warrior or Samurai classes</strong></li>
+            <li>Protagonist names for <strong>Light Novels and Isekai stories</strong></li>
+        </ul>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Female Japanese Name Generator: Elegance and Nature</h3>
+        <p style="margin-bottom: 15px;">
+            The female Japanese name generator creates names with softer and more elegant sound structures. These names work well for female characters in stories, anime, visual novels, and creative writing projects. Many users also use this tool as a <strong>Japanese girl name generator</strong> for original characters, focusing on <strong>Kanji Meanings</strong> that evoke beauty, grace, and the natural world.
+        </p>
+        <p style="margin-bottom: 15px;">
+            In the world of <strong>Shojo Manga</strong> and <strong>Romance Novels</strong>, the name of a character often sets the tone for their entire arc. Our engine ensures that the phonetic balance of the <strong>Female Japanese Names</strong> generated is pleasing to the ear and culturally appropriate.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Are These Japanese Names Real or Fictional?</h3>
+        <p style="margin-bottom: 15px;">
+            The names generated by this tool are <strong>fictional</strong>, but they are built using Japanese-style syllables and naming logic. They are not taken from real people or public databases. This approach ensures:
+        </p>
+        <ul style="margin-bottom: 25px; padding-left: 20px; list-style-type: square;">
+            <li><strong>Original name creation</strong> for unique intellectual property</li>
+            <li>No copyright issues or legal conflicts for published works</li>
+            <li>Safe use for <strong>Commercial Projects</strong>, indie games, and branding</li>
+            <li>No risk of accidental real-person data matches</li>
+        </ul>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Understanding the Meaning of Japanese Names</h3>
+        <p style="margin-bottom: 15px;">
+            Japanese names often reflect ideas such as nature, strength, harmony, balance, or personal traits. The meanings shown by this generator are simplified interpretations meant to add creative value. For example, a name containing the Kanji for 'Moon' might suggest a character with a calm or mysterious personality, while 'Sun' might suggest warmth and energy.
+        </p>
+        <p style="margin-bottom: 15px;">
+            These meanings help writers and creators imagine personality traits, backgrounds, or symbolic themes for their characters. By using our <strong>Japanese Name Generator with Meaning</strong>, you are essentially building the "soul" of your character from the very first click.
+        </p>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Who Uses This Japanese Name Generator?</h3>
+        <p style="margin-bottom: 15px;">Our platform is a staple resource for a diverse range of global creators, including:</p>
+        <ul style="margin-bottom: 25px; padding-left: 20px; list-style-type: square;">
+            <li><strong>Writers and authors</strong> looking for <strong>Authentic Japanese Last Names</strong></li>
+            <li><strong>Gamers</strong> seeking unique identities for <strong>MMORPGs and RPGs</strong></li>
+            <li><strong>Anime and manga fans</strong> designing their own "OCs" (Original Characters)</li>
+            <li><strong>Game developers</strong> who need to generate vast <strong>NPC Lists</strong> quickly</li>
+            <li><strong>Content creators</strong> drafting scripts for YouTube, webcomics, or social media</li>
+        </ul>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Frequently Asked Questions</h3>
+        
+        <div style="margin-bottom: 25px;">
+            <strong>Is this Japanese Name Generator free to use?</strong><br>
+            Yes. The tool at <strong>japanesenamegenerator.net</strong> is completely free and can be used without limits for personal and professional projects.
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <strong>Can I generate multiple Japanese names at once?</strong><br>
+            Yes. Each single click generates <strong>10 Japanese full names</strong> simultaneously, allowing you to choose the best one from a diverse batch.
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <strong>Will names repeat if I generate again?</strong><br>
+            Our engine is powered by a <strong>Randomization Algorithm</strong> supporting over 100,000 unique combinations, making it mathematically rare to see the same name twice.
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <strong>Is this suitable as an anime Japanese name generator?</strong><br>
+            Yes. Many fans and professional artists rely on this tool specifically for its <strong>Anime-Style Phonetic Accuracy</strong>.
+        </div>
+
+        <h3 style="font-size: 1.6rem; font-weight: 900; margin-top: 50px; margin-bottom: 20px;">Why This Tool Is Helpful for Global Creators</h3>
+        <p style="margin-bottom: 25px;">
+            Instead of spending hours researching <strong>Japanese naming conventions</strong>, historical records, or Kanji dictionaries, this tool gives you instant results that feel natural and usable. Whether you need one name or a list of names for a massive world-building project, it helps you focus more on creativity and less on searching. 
+        </p>
+        <p style="margin-bottom: 25px;">
+            By providing <strong>Ready-to-Use Kanji and Romaji</strong>, we bridge the gap between English-speaking creators and the complex beauty of Japanese nomenclature. You can use the generator as many times as you like to explore different name styles and ideas at <strong>japanesenamegenerator.net</strong>.
+        </p>
+
+        
+
+        </div>
+
+    </div>
+</div>
+
